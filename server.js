@@ -21,13 +21,14 @@ async function getPublicReposNumber(req, res, next) {
     const { username } = req.params;
     const response = await fetch(`https://api.github.com/users/${username}`);
     const data = await response.json();
+    console.log(`Fetched data ${data}`)
 
-    redisClient.setex(username, 3600, data);
+    redisClient.setex(username, 3600, data.login);
 
     res.satus(200).send(setResponse(username, data));
   } catch (error) {
     console.error(error);
-    req.status(500).json({error: error});
+    res.status(500).json({error: error});
   }
 }
 
