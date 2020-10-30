@@ -4,14 +4,18 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
+    "start": "nodemon server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "express": "^4.17.1",
+    "node-fetch": "^2.6.1",
     "redis": "^3.0.2",
     "redis-clustr": "^1.7.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.6"
   }
 }
