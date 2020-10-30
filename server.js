@@ -20,12 +20,5 @@ var redis = new RedisClustr({
 //connect to redis
 redis.on("connect", function () {
   console.log("connected");
-  redis.on('message', function(channel, message) { 
-    console.log(channel);
-    console.log(message);
-  });
- 
-  redis.subscribe('my-channel', function(err) {
-    redis.publish('my-channel', 'have a lovely day!');
-  });
+  redis.set('test', 'test');
 });
