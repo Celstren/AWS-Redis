@@ -20,12 +20,12 @@ async function getPublicReposNumber(req, res, next) {
 
     const { username } = req.params;
     const response = await fetch(`https://api.github.com/users/${username}`);
-    const data = await response.json();
+    const data = JSON.stringify(await response.json());
     console.log(`Fetched data ${data}`)
 
-    redisClient.setex(username, 3600, data.login);
+    redisClient.setex(username, 3600, data);
 
-    res.satus(200).send(setResponse(username, data));
+    res.satus(200).send(`Saved successfully`);
   } catch (error) {
     console.error(error);
     res.status(500).send({error: error});
@@ -37,7 +37,7 @@ function cache(req, res, next) {
   redisClient.get(username, function (error, cachedData) {
     if (error) throw error;
     if (cachedData != null) {
-      res.send(setResponse(username, data));
+      res.send(`Data from cache ${cachedData}`);
     } else {
       next();
     }
