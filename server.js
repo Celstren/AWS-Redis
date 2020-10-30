@@ -22,6 +22,10 @@ redis.on("connect", function () {
   console.log("connected");
 });
 
+redis.on("error", function () {
+  console.log("connected");
+});
+
 redis.on("message", function (channel, message) {
   console.log(channel);
   console.log(message);
