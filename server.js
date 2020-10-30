@@ -28,7 +28,7 @@ async function getPublicReposNumber(req, res, next) {
     res.satus(200).send(`Saved successfully`);
   } catch (error) {
     console.error(error);
-    res.status(500).send({error: error});
+    res.send({error: error});
   }
 }
 
