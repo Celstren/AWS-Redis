@@ -25,7 +25,7 @@ async function getPublicReposNumber(req, res, next) {
 
     redisClient.setex(username, 3600, data);
 
-    res.satus(200).send(`Saved successfully`);
+    res.send(`Saved successfully`);
   } catch (error) {
     console.error(error);
     res.send({error: error});
