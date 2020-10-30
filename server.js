@@ -22,6 +22,15 @@ redis.on("connect", function () {
   console.log("connected");
 });
 
+redis.on("message", function (channel, message) {
+  console.log(channel);
+  console.log(message);
+});
+
+redis.subscribe("my-channel", function (err) {
+  redis.publish("my-channel", "have a lovely day!");
+});
+
 //check the functioning
 redis.set("test", "val", function (err) {
   if (err) {
