@@ -13,7 +13,8 @@
     "express": "^4.17.1",
     "node-fetch": "^2.6.1",
     "redis": "^3.0.2",
-    "redis-clustr": "^1.7.0"
+    "redis-clustr": "^1.7.0",
+    "socket.io": "^2.3.0"
   },
   "devDependencies": {
     "nodemon": "^2.0.6"
