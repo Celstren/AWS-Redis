@@ -1,4 +1,4 @@
-const app = require("express");
+const app = require("express")();
 const fetch = require("node-fetch");
 const redis = require("redis");
 var config = require("./config.json");
