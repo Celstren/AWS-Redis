@@ -1,4 +1,4 @@
-const express = require("express");
+const app = require("express");
 const fetch = require("node-fetch");
 const redis = require("redis");
 var config = require("./config.json");
@@ -10,7 +10,6 @@ const REDIS_PORT = config.redisClusterPort;
 const REDIS_HOST = config.redisClusterHost;
 
 const redisClient = redis.createClient(REDIS_PORT, REDIS_HOST)
-const app = express()
 
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/index.html');
