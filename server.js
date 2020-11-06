@@ -4,6 +4,7 @@ const redis = require("redis");
 var config = require("./config.json");
 var http = require('http').createServer(app);
 var io = require('socket.io')(http);
+var bodyParser = require('body-parser')
 
 const PORT = 3000;
 const MESSAGES = 'messages';
@@ -11,6 +12,12 @@ const REDIS_PORT = config.redisClusterPort;
 const REDIS_HOST = config.redisClusterHost;
 
 const redisClient = redis.createClient(REDIS_PORT, REDIS_HOST)
+
+// parse requests of content-type - application/json
+app.use(bodyParser.json());
+
+// parse requests of content-type - application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({ extended: true }));
 
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/index.html');
