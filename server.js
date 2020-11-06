@@ -6,6 +6,7 @@ var http = require('http').createServer(app);
 var io = require('socket.io')(http);
 
 const PORT = 3000;
+const MESSAGES = 'messages';
 const REDIS_PORT = config.redisClusterPort;
 const REDIS_HOST = config.redisClusterHost;
 
@@ -25,6 +26,43 @@ io.on('connection', (socket) => {
   });
 });
 
+function getCacheMessages(req, res, next) {
+  redisClient.lrange(MESSAGES, 0, -1, function (err, replies) {
+    if (err) {
+      res.send(err);
+    } else {
+      if (replies) {
+        replies.forEach(function (reply, index) {
+          console.log("Valor " + index + ": " + reply);
+        });
+        res.send(replies);
+      } else {
+        res.send([]);
+      }
+    }
+  });
+}
+
+function saveOnCache(req, res, next) {
+  let message = req.body.message;
+  if (message) {
+    redisClient.rpush(MESSAGES, message, function (err, reply) {
+      if (err) {
+        res.send(err);
+      } else {
+        res.send("Mensaje guardado");
+      }
+    });
+  } else {
+    res.send("Mensaje inválido");
+  }
+}
+
+app.get('/repos/:username', cache, getPublicReposNumber);
+
+app.post('/messages', saveOnCache);
+
+app.get('/messages', getCacheMessages);
 
 http.listen(PORT, () => {
   console.log(`Example app listening at http://localhost:${PORT}`)
@@ -59,5 +97,3 @@ http.listen(PORT, () => {
 //     }
 //   })
 // }
-
-// app.get('/repos/:username', cache, getPublicReposNumber);
