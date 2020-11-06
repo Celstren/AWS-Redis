@@ -31,7 +31,9 @@
   </script>
   <script>
     $( document ).ready(function() {
-      console.log( "ready!" );
+      $.get( "ec2-3-139-84-69.us-east-2.compute.amazonaws.com:3000/messages", function( data ) {
+        console.log(data);
+      });
     });
   </script>
   <body>
