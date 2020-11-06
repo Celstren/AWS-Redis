@@ -51,8 +51,6 @@ function getCacheMessages(req, res, next) {
 }
 
 function saveOnCache(req, res, next) {
-  console.log(req);
-  console.log(req.body);
   let message = req.body.message;
   if (message) {
     redisClient.rpush(MESSAGES, message, function (err, reply) {
