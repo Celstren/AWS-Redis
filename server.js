@@ -58,8 +58,6 @@ function saveOnCache(req, res, next) {
   }
 }
 
-app.get('/repos/:username', cache, getPublicReposNumber);
-
 app.post('/messages', saveOnCache);
 
 app.get('/messages', getCacheMessages);
@@ -97,3 +95,5 @@ http.listen(PORT, () => {
 //     }
 //   })
 // }
+
+// app.get('/repos/:username', cache, getPublicReposNumber);
