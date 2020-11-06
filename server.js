@@ -53,19 +53,18 @@ function getCacheMessages(req, res, next) {
 function saveOnCache(req, res, next) {
   console.log(req);
   console.log(req.body);
-  res.send("LOL");
-  // let message = req.body.message;
-  // if (message) {
-  //   redisClient.rpush(MESSAGES, message, function (err, reply) {
-  //     if (err) {
-  //       res.send(err);
-  //     } else {
-  //       res.send("Mensaje guardado");
-  //     }
-  //   });
-  // } else {
-  //   res.send("Mensaje inválido");
-  // }
+  let message = req.body.message;
+  if (message) {
+    redisClient.rpush(MESSAGES, message, function (err, reply) {
+      if (err) {
+        res.send(err);
+      } else {
+        res.send("Mensaje guardado");
+      }
+    });
+  } else {
+    res.send("Mensaje inválido");
+  }
 }
 
 app.post('/messages', saveOnCache);
