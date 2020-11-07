@@ -66,6 +66,10 @@ app.post('/messages', sendMessage);
 
 app.get('/messages', getCacheMessages);
 
+pp.get('/', function (req, res, next) {
+  console.log("Server started");
+});
+
 http.listen(PORT, () => {
   console.log(`Example app listening at http://localhost:${PORT}`)
 });
