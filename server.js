@@ -12,17 +12,23 @@ const wss = new WebSocket.Server({
 });
 
 wss.on("connection", function connection(ws, req) {
-  const clientId = req.url.replace("/?id=", "");
-  console.log(`Client connected with ID: ${clientId}`);
+  console.log(`Client connected`);
+});
 
-  let n = 0;
-  const interval = setInterval(() => {
-    ws.send(`AWS-WS: you have been connected for ${n++} seconds`);
-  }, 1000);
+ws.on("close", () => {
+  console.log("Client disconnected");
+});
 
-  ws.on("close", () => {
-    clearInterval(interval);
+ws.on('message', function incoming(data) {
+  wss.clients.forEach(function each(client) {
+    if (client.readyState === WebSocket.OPEN) {
+      client.send(data);
+    }
   });
+});
+
+server.get('/', (req, res) => {
+  res.send('Hello World!')
 });
 
 const port = process.env.PORT || 3000;
