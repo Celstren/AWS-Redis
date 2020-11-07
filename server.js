@@ -6,7 +6,7 @@ const redis = require("redis");
 
 var config = require("./config.json");
 
-const PORT = 3000;
+const PORT = config.port;
 const REDIS_PORT = config.redisClusterPort;
 const REDIS_HOST = config.redisClusterHost;
 
