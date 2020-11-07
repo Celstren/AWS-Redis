@@ -46,10 +46,6 @@ wss.on("close", () => {
   console.log("Client disconnected");
 });
 
-wss.on('message', function incoming(data) {
-  console.log("Data coming: " + data);
-});
-
 app.get('/', (req, res) => {
   res.send('Hello World!')
 });
@@ -57,7 +53,6 @@ app.get('/', (req, res) => {
 app.post('/message', (req, res) => {
   var data = req.body.message;
   wss.clients.forEach(function each(client) {
-    console.log(JSON.stringify(client));
     if (client.readyState === WebSocket.OPEN) {
       client.send(data);
     }
