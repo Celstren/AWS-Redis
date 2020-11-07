@@ -1,9 +1,14 @@
 const WebSocket = require("ws");
 const server = require("http").createServer();
 const express = require("express");
+const bodyParser = require('body-parser')
 const app = express();
 
-app.use(express.bodyParser());
+// parse requests of content-type - application/json
+app.use(bodyParser.json());
+
+// parse requests of content-type - application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({ extended: true }));
 
 // Add headers
 app.use(function (req, res, next) {
