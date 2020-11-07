@@ -23,7 +23,7 @@ wss.on('message', function incoming(data) {
   console.log(data);
 });
 
-server.get('/', (req, res) => {
+app.get('/', (req, res) => {
   res.send('Hello World!')
 });
 
