@@ -54,6 +54,12 @@ app.get('/', (req, res) => {
   res.send('Hello World!')
 });
 
+app.post('/message', (req, res) => {
+  var data = req.body.message;
+  wss.emit("message", data);
+  res.send('Message sent');
+});
+
 const port = process.env.PORT || 3000;
 server.listen(port, () => {
   console.log(`Server listening on port ${port}`);
