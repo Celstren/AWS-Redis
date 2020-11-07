@@ -19,17 +19,13 @@ app.use(bodyParser.json());
 // parse requests of content-type - application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.get('/', (req, res) => {
-  res.sendFile(__dirname + '/index.html');
-});
-
 io.on('connection', (socket) => {
   console.log('a user connected');
   socket.on('disconnect', () => {
       console.log('user disconnected');
   });
-  socket.on('chat message', (msg) => {
-      io.emit('chat message', msg);
+  socket.on('CHAT_MESSAGE', (msg) => {
+      io.emit('CHAT_MESSAGE', msg);
   });
 });
 
@@ -50,9 +46,10 @@ function getCacheMessages(req, res, next) {
   });
 }
 
-function saveOnCache(req, res, next) {
+function sendMessage(req, res, next) {
   let message = req.body.message;
   if (message) {
+    socket.emit('CHAT_MESSAGE', message);
     redisClient.rpush(MESSAGES, message, function (err, reply) {
       if (err) {
         res.send(err);
@@ -65,7 +62,7 @@ function saveOnCache(req, res, next) {
   }
 }
 
-app.post('/messages', saveOnCache);
+app.post('/messages', sendMessage);
 
 app.get('/messages', getCacheMessages);
 
