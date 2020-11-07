@@ -56,7 +56,12 @@ app.get('/', (req, res) => {
 
 app.post('/message', (req, res) => {
   var data = req.body.message;
-  wss.emit("message", data);
+  wss.clients.forEach(function each(client) {
+    console.log(JSON.stringify(client));
+    if (client.readyState === WebSocket.OPEN) {
+      client.send(data);
+    }
+  });
   res.send('Message sent');
 });
 
