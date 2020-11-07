@@ -9,6 +9,7 @@ var config = require("./config.json");
 const PORT = config.port;
 const REDIS_PORT = config.redisClusterPort;
 const REDIS_HOST = config.redisClusterHost;
+const REDIS_MESSAGES = "redis_messages";
 
 const redisClient = redis.createClient(REDIS_PORT, REDIS_HOST);
 const app = express();
@@ -70,7 +71,7 @@ server.listen(PORT, () => {
 function saveAndSendMessage(req, res, next) {
   var message = req.body.message;
   if (message) {
-    redisClient.rpush(MESSAGES, message, function (err, reply) {
+    redisClient.rpush(REDIS_MESSAGES, message, function (err, reply) {
       if (err) {
         res.send(err);
       } else {
@@ -93,7 +94,7 @@ function saveAndSendMessage(req, res, next) {
 }
 
 function getCacheMessages(req, res, next) {
-  redisClient.lrange(MESSAGES, 0, -1, function (err, replies) {
+  redisClient.lrange(REDIS_MESSAGES, 0, -1, function (err, replies) {
     if (err) {
       res.send(err);
     } else {
