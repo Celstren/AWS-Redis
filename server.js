@@ -51,12 +51,13 @@ app.get('/', (req, res) => {
 });
 
 app.post('/message', (req, res) => {
-  var data = req.body.message;
+  var message = req.body.message;
   wss.clients.forEach(function each(client) {
     if (client.readyState === WebSocket.OPEN) {
-      client.send({
-        "message": data,
-      });
+      const data = {
+        "message": message,
+      };
+      client.send(JSON.stringify(data));
     }
   });
   res.send('Message sent');
