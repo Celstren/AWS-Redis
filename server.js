@@ -87,10 +87,9 @@ function saveAndSendMessage(req, res, next) {
       }
     });
     res.send('Mensaje enviado');
-    return;
+  } else {
+    res.send('Mensaje fallo');
   }
-  res.send('Fallo envío de mensaje');
-  return;
 }
 
 function getCacheMessages(req, res, next) {
