@@ -66,7 +66,7 @@ app.post('/messages', sendMessage);
 
 app.get('/messages', getCacheMessages);
 
-pp.get('/', function (req, res, next) {
+app.get('/', function (req, res, next) {
   console.log("Server started");
 });
 
