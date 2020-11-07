@@ -47,7 +47,7 @@ wss.on("close", () => {
 });
 
 wss.on('message', function incoming(data) {
-  console.log(data);
+  console.log("Data coming: " + data);
 });
 
 app.get('/', (req, res) => {
