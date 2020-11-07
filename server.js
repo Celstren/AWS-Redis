@@ -54,7 +54,9 @@ app.post('/message', (req, res) => {
   var data = req.body.message;
   wss.clients.forEach(function each(client) {
     if (client.readyState === WebSocket.OPEN) {
-      client.send(data);
+      client.send({
+        "message": data,
+      });
     }
   });
   res.send('Message sent');
