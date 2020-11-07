@@ -75,18 +75,17 @@ function saveAndSendMessage(req, res, next) {
       if (err) {
         res.send(err);
       } else {
-        res.send("Mensaje guardado");
+        wss.clients.forEach(function each(client) {
+          if (client.readyState === WebSocket.OPEN) {
+            const data = {
+              "message": message,
+            };
+            client.send(JSON.stringify(data));
+          }
+        });
+        res.send("Mensaje guardado y enviado");
       }
     });
-    wss.clients.forEach(function each(client) {
-      if (client.readyState === WebSocket.OPEN) {
-        const data = {
-          "message": message,
-        };
-        client.send(JSON.stringify(data));
-      }
-    });
-    res.send('Mensaje enviado');
   } else {
     res.send('Mensaje fallo');
   }
