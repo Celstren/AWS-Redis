@@ -1,7 +1,16 @@
 const WebSocket = require("ws");
 const server = require("http").createServer();
 const express = require("express");
-const bodyParser = require('body-parser')
+const bodyParser = require('body-parser');
+const redis = require("redis");
+
+var config = require("./config.json");
+
+const PORT = 3000;
+const REDIS_PORT = config.redisClusterPort;
+const REDIS_HOST = config.redisClusterHost;
+
+const redisClient = redis.createClient(REDIS_PORT, REDIS_HOST);
 const app = express();
 
 // parse requests of content-type - application/json
@@ -50,20 +59,52 @@ app.get('/', (req, res) => {
   res.send('Hello World!')
 });
 
-app.post('/message', (req, res) => {
-  var message = req.body.message;
-  wss.clients.forEach(function each(client) {
-    if (client.readyState === WebSocket.OPEN) {
-      const data = {
-        "message": message,
-      };
-      client.send(JSON.stringify(data));
-    }
-  });
-  res.send('Message sent');
+app.get('/message', getCacheMessages);
+
+app.post('/message', saveAndSendMessage);
+
+server.listen(PORT, () => {
+  console.log(`Server listening on port ${PORT}`);
 });
 
-const port = process.env.PORT || 3000;
-server.listen(port, () => {
-  console.log(`Server listening on port ${port}`);
-});
+function saveAndSendMessage(req, res, next) {
+  var message = req.body.message;
+  if (message) {
+    redisClient.rpush(MESSAGES, message, function (err, reply) {
+      if (err) {
+        res.send(err);
+      } else {
+        res.send("Mensaje guardado");
+      }
+    });
+    wss.clients.forEach(function each(client) {
+      if (client.readyState === WebSocket.OPEN) {
+        const data = {
+          "message": message,
+        };
+        client.send(JSON.stringify(data));
+      }
+    });
+    res.send('Mensaje enviado');
+    return;
+  }
+  res.send('Fallo envío de mensaje');
+  return;
+}
+
+function getCacheMessages(req, res, next) {
+  redisClient.lrange(MESSAGES, 0, -1, function (err, replies) {
+    if (err) {
+      res.send(err);
+    } else {
+      if (replies) {
+        replies.forEach(function (reply, index) {
+          console.log("Valor " + index + ": " + reply);
+        });
+        res.send(replies);
+      } else {
+        res.send([]);
+      }
+    }
+  });
+}
