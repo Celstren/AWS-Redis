@@ -83,18 +83,18 @@ function getCacheMessages(req, res, next) {
     console.log("Getting data from cache");
     redisClient.smembers(REDIS_MESSAGES, function (err, replies) {
       if (err) {
-        console.log(err);
+        res.send(err);
       } else {
         if (replies) {
           res.send(replies);
-          return;
+        } else {
+          next();
         }
       }
     });
   } catch (e) {
-    console.log(e);
+    res.send(e);
   }
-  next();
 }
 
 function saveMessages(req, res, next) {
