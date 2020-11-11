@@ -4,7 +4,7 @@ const express         = require("express");
 const bodyParser      = require('body-parser');
 const redis           = require("redis");
 const mysql           = require('mysql');
-var moment            = require('moment');
+const moment          = require('moment-timezone');
 
 var config            = require("./config.json");
 
@@ -137,7 +137,7 @@ function saveDBMessages(req, res, next) {
     var messageData = {
       id: 0,
       text: text,
-      date: moment().format(),
+      date: moment().tz("America/Lima").format(),
     };
     pool.query('INSERT INTO public.message (text, createdAt) VALUES ( ? , ? )', [messageData.text, messageData.date], function (error, results, fields) {
       if (error) throw error;
