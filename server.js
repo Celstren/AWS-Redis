@@ -69,11 +69,7 @@ app.get('/', (req, res) => {
   res.send('Hello World!')
 });
 
-app.get('/message', getCacheMessages);
-
 app.get('/messages', getDBMessages);
-
-app.post('/message', saveAndSendMessage);
 
 app.post('/messages', saveDBMessages);
 
@@ -105,30 +101,33 @@ function saveAndSendMessage(req, res, next) {
 }
 
 function getCacheMessages(req, res, next) {
-  redisClient.lrange(REDIS_MESSAGES, 0, -1, function (err, replies) {
-    if (err) {
-      res.send(err);
-    } else {
-      if (replies) {
-        replies.forEach(function (reply, index) {
-          console.log("Valor " + index + ": " + reply);
-        });
-        res.send(replies);
+  try {
+    redisClient.smembers(REDIS_MESSAGES, function (err, replies) {
+      if (err) {
+        res.send(err);
       } else {
-        res.send([]);
+        if (replies) {
+          console.log("Data coming from cache");
+          res.send(replies);
+        } else {
+          next();
+        }
       }
-    }
-  });
+    });
+  } catch (e) {
+    res.send(e);
+  } 
 }
 
 function getDBMessages(req, res, next) {
-  pool.query('SELECT * FROM public.message', function (error, results, fields) {
-    if (error) {
-      res.send(error);
-      return;
-    }
-    res.send(results);
-  });
+  try {
+    pool.query('SELECT * FROM public.message', function (error, results, fields) {
+      if (error) throw error;
+      res.send(results);
+    });
+  } catch (e) {
+    res.send(e);
+  }
 }
 
 function saveDBMessages(req, res, next) {
@@ -136,9 +135,30 @@ function saveDBMessages(req, res, next) {
   if (text) {
     pool.query('INSERT INTO public.message (text, createdAt) VALUES ( ? , CURRENT_TIMESTAMP())', text, function (error, results, fields) {
       if (error) throw error;
-      res.send("Mensaje guardado en DB");
+      res.send(results);
     });
   } else {
     res.send("Mensaje Inválido");
+  }
+}
+
+function getMessages(req, res, next) {
+  try {
+    pool.query('SELECT * FROM public.message', function (error, results, fields) {
+      if (error) {
+        res.send(error);
+        return;
+      }
+      var multi = redisClient.multi();
+      results.forEach(function each(messageData) {
+        multi.sadd(REDIS_MESSAGES, JSON.stringify(messageData));
+      });
+      multi.exec(function(err, response) {
+        if(err) throw err; 
+        res.send(results);
+      })
+    });
+  } catch (e) {
+    res.send(e);
   }
 }
