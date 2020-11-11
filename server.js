@@ -124,7 +124,7 @@ function getCacheMessages(req, res, next) {
 function getDBMessages(req, res, next) {
   pool.query('SELECT * FROM public.message', function (error, results, fields) {
     if (error) throw error;
-    console.log('Data: ', results);
+    res.send('Data: ', results);
   });
 }
 
@@ -133,7 +133,7 @@ function saveDBMessages(req, res, next) {
   if (text) {
     pool.query('INSERT INTO public.message (text, createdAt) VALUES ( ? , CURRENT_TIMESTAMP())', text, function (error, results, fields) {
       if (error) throw error;
-      console.log('Data: ', results);
+      res.send('Data: ', results);
     });
   } else {
     res.send("Mensaje Inválido");
