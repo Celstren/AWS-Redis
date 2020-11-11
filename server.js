@@ -70,45 +70,22 @@ app.get('/', (req, res) => {
   res.send('Hello World!')
 });
 
-app.get('/messages', getDBMessages);
+app.get('/messages', getCacheMessages, getMessages);
 
-app.post('/messages', saveDBMessages);
+app.post('/messages', saveMessages);
 
 server.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}`);
 });
 
-function saveAndSendMessage(req, res, next) {
-  var message = req.body.message;
-  if (message) {
-    redisClient.rpush(REDIS_MESSAGES, message, function (err, reply) {
-      if (err) {
-        res.send(err);
-      } else {
-        wss.clients.forEach(function each(client) {
-          if (client.readyState === WebSocket.OPEN) {
-            const data = {
-              "message": message,
-            };
-            client.send(JSON.stringify(data));
-          }
-        });
-        res.send("Mensaje guardado y enviado");
-      }
-    });
-  } else {
-    res.send('Mensaje fallo');
-  }
-}
-
 function getCacheMessages(req, res, next) {
   try {
+    console.log("Getting data from cache");
     redisClient.smembers(REDIS_MESSAGES, function (err, replies) {
       if (err) {
         res.send(err);
       } else {
         if (replies) {
-          console.log("Data coming from cache");
           res.send(replies);
         } else {
           next();
@@ -120,18 +97,7 @@ function getCacheMessages(req, res, next) {
   } 
 }
 
-function getDBMessages(req, res, next) {
-  try {
-    pool.query('SELECT * FROM public.message', function (error, results, fields) {
-      if (error) throw error;
-      res.send(results);
-    });
-  } catch (e) {
-    res.send(e);
-  }
-}
-
-function saveDBMessages(req, res, next) {
+function saveMessages(req, res, next) {
   var text = req.body.message;
   if (text) {
     var messageData = {
@@ -139,11 +105,21 @@ function saveDBMessages(req, res, next) {
       text: text,
       date: moment().tz("America/Lima").format(),
     };
-    console.log(messageData.date);
     pool.query('INSERT INTO public.message (text, createdAt) VALUES ( ? , ? )', [messageData.text, messageData.date], function (error, results, fields) {
       if (error) throw error;
-      console.log(results.insertId);
-      res.send(results);
+      messageData.id = results.insertId;
+      redisClient.sadd(REDIS_MESSAGES, JSON.stringify(messageData), function (err, reply) {
+        if (err) {
+          res.send(err);
+        } else {
+          wss.clients.forEach(function each(client) {
+            if (client.readyState === WebSocket.OPEN) {
+              client.send(JSON.stringify(messageData));
+            }
+          });
+          res.send("Mensaje guardado y enviado");
+        }
+      });
     });
   } else {
     res.send("Mensaje Inválido");
