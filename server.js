@@ -83,6 +83,7 @@ function getCacheMessages(req, res, next) {
     console.log("Getting data from cache");
     redisClient.smembers(REDIS_MESSAGES, function (err, replies) {
       if (err) {
+        console.log("Error al traer los datos de redis");
         res.send(err);
       } else {
         if (replies) {
