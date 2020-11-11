@@ -57,8 +57,6 @@ var pool  = mysql.createPool({
   database : config.database
 });
 
-connection.connect();
-
 wss.on("connection", function connection(ws, req) {
   console.log(`Client connected`);
 });
