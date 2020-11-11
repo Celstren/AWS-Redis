@@ -11,7 +11,7 @@ var config            = require("./config.json");
 const PORT            = config.port;
 const REDIS_PORT      = config.redisClusterPort;
 const REDIS_HOST      = config.redisClusterHost;
-const REDIS_MESSAGES  = "redis_messages";
+const REDIS_MESSAGES  = "cache_messages";
 
 const redisClient = redis.createClient(REDIS_PORT, REDIS_HOST);
 const app = express();
