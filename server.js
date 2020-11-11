@@ -139,6 +139,7 @@ function saveDBMessages(req, res, next) {
       text: text,
       date: moment().tz("America/Lima").format(),
     };
+    console.log(messageData.date);
     pool.query('INSERT INTO public.message (text, createdAt) VALUES ( ? , ? )', [messageData.text, messageData.date], function (error, results, fields) {
       if (error) throw error;
       console.log(results.insertId);
