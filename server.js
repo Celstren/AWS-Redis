@@ -131,14 +131,19 @@ function getDBMessages(req, res, next) {
 }
 
 function saveDBMessages(req, res, next) {
-  var text = req.body.message;
-  if (text) {
-    pool.query('INSERT INTO public.message (text, createdAt) VALUES ( ? , CURRENT_TIMESTAMP())', text, function (error, results, fields) {
-      if (error) throw error;
-      res.send(results);
-    });
-  } else {
-    res.send("Mensaje Inválido");
+  try {
+    var text = req.body.message;
+    if (text) {
+      let now = Date();
+      pool.query('INSERT INTO public.message (text, createdAt) VALUES ( ? , ?)', [text, Date.now()], function (error, results, fields) {
+        if (error) throw error;
+        res.send(results);
+      });
+    } else {
+      res.send("Mensaje Inválido");
+    }
+  } catch (e) {
+    res.send(e);
   }
 }
 
