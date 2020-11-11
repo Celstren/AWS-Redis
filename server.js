@@ -99,13 +99,15 @@ function getCacheMessages(req, res, next) {
 
 function saveMessages(req, res, next) {
   var text = req.body.message;
+  var user = req.body.user;
   if (text) {
     var messageData = {
       id: 0,
       text: text,
+      user: user,
       date: moment().tz("America/Lima").format(),
     };
-    pool.query('INSERT INTO public.message (text, createdAt) VALUES ( ? , ? )', [messageData.text, messageData.date], function (error, results, fields) {
+    pool.query('INSERT INTO public.message (text, user, createdAt) VALUES ( ? , ? , ? )', [messageData.text, messageData.user, messageData.date], function (error, results, fields) {
       if (error) throw error;
       messageData.id = results.insertId;
       redisClient.sadd(REDIS_MESSAGES, JSON.stringify(messageData), function (err, reply) {
