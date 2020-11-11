@@ -1,15 +1,16 @@
-const WebSocket = require("ws");
-const server = require("http").createServer();
-const express = require("express");
-const bodyParser = require('body-parser');
-const redis = require("redis");
+const WebSocket       = require("ws");
+const server          = require("http").createServer();
+const express         = require("express");
+const bodyParser      = require('body-parser');
+const redis           = require("redis");
+const mysql           = require('mysql');
 
-var config = require("./config.json");
+var config            = require("./config.json");
 
-const PORT = config.port;
-const REDIS_PORT = config.redisClusterPort;
-const REDIS_HOST = config.redisClusterHost;
-const REDIS_MESSAGES = "redis_messages";
+const PORT            = config.port;
+const REDIS_PORT      = config.redisClusterPort;
+const REDIS_HOST      = config.redisClusterHost;
+const REDIS_MESSAGES  = "redis_messages";
 
 const redisClient = redis.createClient(REDIS_PORT, REDIS_HOST);
 const app = express();
@@ -48,6 +49,16 @@ const wss = new WebSocket.Server({
   server,
 });
 
+var pool  = mysql.createPool({
+  host     : config.mysqlHost,
+  port: config.mysqlPort,
+  user     : config.mysqlUser,
+  password : config.mysqlPassword,
+  database : config.database
+});
+
+connection.connect();
+
 wss.on("connection", function connection(ws, req) {
   console.log(`Client connected`);
 });
@@ -62,7 +73,11 @@ app.get('/', (req, res) => {
 
 app.get('/message', getCacheMessages);
 
+app.get('/messages', getDBMessages);
+
 app.post('/message', saveAndSendMessage);
+
+app.post('/messages', saveDBMessages);
 
 server.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}`);
@@ -106,4 +121,23 @@ function getCacheMessages(req, res, next) {
       }
     }
   });
+}
+
+function getDBMessages(req, res, next) {
+  pool.query('SELECT * FROM public.message', function (error, results, fields) {
+    if (error) throw error;
+    console.log('Data: ', results);
+  });
+}
+
+function saveDBMessages(req, res, next) {
+  var text = req.body.message;
+  if (text) {
+    pool.query('INSERT INTO public.message (text, createdAt) VALUES ( ? , CURRENT_TIMESTAMP())', text, function (error, results, fields) {
+      if (error) throw error;
+      console.log('Data: ', results);
+    });
+  } else {
+    res.send("Mensaje Inválido");
+  }
 }
