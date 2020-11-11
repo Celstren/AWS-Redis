@@ -133,7 +133,12 @@ function getDBMessages(req, res, next) {
 function saveDBMessages(req, res, next) {
   var text = req.body.message;
   if (text) {
-    pool.query('INSERT INTO public.message (text, createdAt) VALUES ( ? , ? )', [text, Date.now()], function (error, results, fields) {
+    var messageData = {
+      id: 0,
+      text: text,
+      date: Date.now(),
+    };
+    pool.query('INSERT INTO public.message (text, createdAt) VALUES ( ? , ? )', [messageData.text, messageData.date], function (error, results, fields) {
       if (error) throw error;
       console.log(results.insertId);
       res.send(results);
