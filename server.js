@@ -117,7 +117,7 @@ function saveMessages(req, res, next) {
               client.send(JSON.stringify(messageData));
             }
           });
-          res.send("Mensaje guardado y enviado");
+          res.send(messageData);
         }
       });
     });
