@@ -108,7 +108,7 @@ function saveMessages(req, res, next) {
   var user = req.body.user;
   if (text) {
     var messageData = {
-      id: 0,
+      idmessage: 0,
       text: text,
       user: user,
       date: moment().tz("America/Lima").format(),
