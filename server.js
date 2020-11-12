@@ -106,7 +106,8 @@ function getCacheMessages(req, res, next) {
 function saveMessages(req, res, next) {
   var text = req.body.message;
   var user = req.body.user;
-  if (text) {
+  console.log("HERE");
+  if (text && user) {
     var messageData = {
       idmessage: 0,
       text: text,
