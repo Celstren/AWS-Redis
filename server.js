@@ -112,16 +112,22 @@ function saveMessages(req, res, next) {
     pool.query('INSERT INTO public.message (text, user, createdAt) VALUES ( ? , ? , ? )', [messageData.text, messageData.user, messageData.date], function (error, results, fields) {
       if (error) throw error;
       messageData.id = results.insertId;
-      redisClient.sadd(REDIS_MESSAGES, 3600, JSON.stringify(messageData), function (err, reply) {
+      redisClient.sadd(REDIS_MESSAGES, JSON.stringify(messageData), function (err, reply) {
         if (err) {
           res.send(err);
         } else {
-          wss.clients.forEach(function each(client) {
-            if (client.readyState === WebSocket.OPEN) {
-              client.send(JSON.stringify(messageData));
+          redisClient.expire(REDIS_MESSAGES, 3600, function(err, reply){
+            if (err) {
+              res.send(err);
+            } else {
+              wss.clients.forEach(function each(client) {
+                if (client.readyState === WebSocket.OPEN) {
+                  client.send(JSON.stringify(messageData));
+                }
+              });
+              res.send(messageData);
             }
           });
-          res.send(messageData);
         }
       });
     });
