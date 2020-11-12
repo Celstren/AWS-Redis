@@ -88,7 +88,11 @@ function getCacheMessages(req, res, next) {
         res.send(err);
       } else {
         if (replies && replies.length > 0) {
-          res.send(JSON.parse(replies));
+          let data = [];
+          replies.forEach(function each(reply) {
+            data.push(JSON.parse(reply))
+          })
+          res.send(data);
         } else {
           next();
         }
