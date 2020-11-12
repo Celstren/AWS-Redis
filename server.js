@@ -74,6 +74,8 @@ app.get('/messages', getCacheMessages, getMessages);
 
 app.post('/messages', saveMessages);
 
+app.delete('/messages', clearCacheMessages);
+
 server.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}`);
 });
@@ -110,7 +112,7 @@ function saveMessages(req, res, next) {
     pool.query('INSERT INTO public.message (text, user, createdAt) VALUES ( ? , ? , ? )', [messageData.text, messageData.user, messageData.date], function (error, results, fields) {
       if (error) throw error;
       messageData.id = results.insertId;
-      redisClient.sadd(REDIS_MESSAGES, JSON.stringify(messageData), function (err, reply) {
+      redisClient.sadd(REDIS_MESSAGES, 3600, JSON.stringify(messageData), function (err, reply) {
         if (err) {
           res.send(err);
         } else {
@@ -144,6 +146,16 @@ function getMessages(req, res, next) {
         res.send(results);
       })
     });
+  } catch (e) {
+    res.send(e);
+  }
+}
+
+function clearCacheMessages(req, res, next) {
+  try {
+    redisClient.del(REDIS_MESSAGES, function(err, reply) {
+      res.send("Messages deleted from cache");
+  });
   } catch (e) {
     res.send(e);
   }
