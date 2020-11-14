@@ -148,10 +148,7 @@ function getMessages(req, res, next) {
         res.send(error);
         return;
       }
-      if (err) {
-        res.send(err);
-      } else {
-        var multi = redisClient.multi();
+      var multi = redisClient.multi();
         results.forEach(function each(messageData) {
           multi.sadd(REDIS_MESSAGES, JSON.stringify(messageData));
         });
@@ -159,7 +156,6 @@ function getMessages(req, res, next) {
           if(err) throw err; 
           res.send(results);
         });
-      }
     });
   } catch (e) {
     res.send(e);
