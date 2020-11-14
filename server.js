@@ -120,7 +120,7 @@ function saveMessages(req, res, next) {
         if (err) {
           res.send(err);
         } else {
-          redisClient.expire(REDIS_MESSAGES, 30, function(err, reply){
+          redisClient.expire(REDIS_MESSAGES, 3600, function(err, reply){
             if (err) {
               res.send(err);
             } else {
@@ -148,7 +148,7 @@ function getMessages(req, res, next) {
         res.send(error);
         return;
       }
-      redisClient.expire(REDIS_MESSAGES, 30, function(err, reply){
+      redisClient.expire(REDIS_MESSAGES, 3600, function(err, reply){
         if (err) {
           res.send(err);
         } else {
