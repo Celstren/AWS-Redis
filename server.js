@@ -120,7 +120,7 @@ function saveMessages(req, res, next) {
         if (err) {
           res.send(err);
         } else {
-          redisClient.expire(REDIS_MESSAGES, 1, function(err, reply){
+          redisClient.expire(REDIS_MESSAGES, 30, function(err, reply){
             if (err) {
               res.send(err);
             } else {
@@ -148,14 +148,20 @@ function getMessages(req, res, next) {
         res.send(error);
         return;
       }
-      var multi = redisClient.multi();
-        results.forEach(function each(messageData) {
-          multi.sadd(REDIS_MESSAGES, JSON.stringify(messageData));
-        });
-        multi.exec(function(err, response) {
-          if(err) throw err; 
-          res.send(results);
-        });
+      redisClient.expire(REDIS_MESSAGES, 30, function(err, reply){
+        if (err) {
+          res.send(err);
+        } else {
+          var multi = redisClient.multi();
+          results.forEach(function each(messageData) {
+            multi.sadd(REDIS_MESSAGES, JSON.stringify(messageData));
+          });
+          multi.exec(function(err, response) {
+            if(err) throw err; 
+            res.send(results);
+          });
+        }
+      });
     });
   } catch (e) {
     res.send(e);
