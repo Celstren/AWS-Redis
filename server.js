@@ -148,20 +148,18 @@ function getMessages(req, res, next) {
         res.send(error);
         return;
       }
-      redisClient.expire(REDIS_MESSAGES, 1, function(err, reply){
-        if (err) {
-          res.send(err);
-        } else {
-          var multi = redisClient.multi();
-          results.forEach(function each(messageData) {
-            multi.sadd(REDIS_MESSAGES, JSON.stringify(messageData));
-          });
-          multi.exec(function(err, response) {
-            if(err) throw err; 
-            res.send(results);
-          });
-        }
-      });
+      if (err) {
+        res.send(err);
+      } else {
+        var multi = redisClient.multi();
+        results.forEach(function each(messageData) {
+          multi.sadd(REDIS_MESSAGES, JSON.stringify(messageData));
+        });
+        multi.exec(function(err, response) {
+          if(err) throw err; 
+          res.send(results);
+        });
+      }
     });
   } catch (e) {
     res.send(e);
