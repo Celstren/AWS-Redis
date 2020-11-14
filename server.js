@@ -142,6 +142,7 @@ function saveMessages(req, res, next) {
 
 function getMessages(req, res, next) {
   try {
+    console.log("get data from DB");
     pool.query('SELECT * FROM public.message', function (error, results, fields) {
       if (error) {
         res.send(error);
